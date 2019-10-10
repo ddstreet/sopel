@@ -9,19 +9,44 @@ from sopel import tools
 
 
 class IrcLoggingHandler(logging.Handler):
-    def __init__(self, bot, level):
+    def __init__(self, bot, level, lines_split=False, lines_leading=0, lines_trailing=0):
         super(IrcLoggingHandler, self).__init__(level)
         self._bot = bot
         self._channel = bot.config.core.logging_channel
+        self._lines_split = lines_split
+        self._lines_leading = max(lines_leading, 0)
+        self._lines_trailing = max(lines_trailing, 0)
 
     def emit(self, record):
         try:
-            msg = self.format(record)
-            self._bot.say(msg, self._channel)
+            for msg in self.split_msg(self.format(record)):
+                self._bot.say(msg, self._channel)
         except (KeyboardInterrupt, SystemExit):
             raise
         except Exception:  # TODO: Be specific
             self.handleError(record)
+
+    def split_msg(self, msg):
+        if not self._lines_split:
+            return [msg]
+
+        leading = self._lines_leading
+        trailing = self._lines_trailing
+        lines = msg.splitlines()
+
+        # don't cut any if neither are specified
+        if leading == 0 and trailing == 0:
+            return lines
+
+        # remove lines if the 'lines cut' line will replace > a single line
+        if len(lines) > leading + trailing + 1:
+            cut = len(lines) - leading - trailing
+            parts = lines[:leading]
+            parts += ['...<%s lines cut>...' % cut]
+            if trailing > 0:
+                parts += lines[-(trailing):]
+            lines = parts
+        return lines
 
 
 class ChannelOutputFormatter(logging.Formatter):
