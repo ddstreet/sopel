@@ -221,13 +221,23 @@ class Sopel(irc.Bot):
             channel_level = self.config.core.logging_channel_level or base_level
             channel_format = self.config.core.logging_channel_format or base_format
             channel_datefmt = self.config.core.logging_channel_datefmt or base_datefmt
+            channel_splitlines = self.config.core.logging_channel_splitlines
+            channel_splitlines_leading = self.config.core.logging_channel_splitlines_leading
+            channel_splitlines_trailing = self.config.core.logging_channel_splitlines_trailing
             channel_params = {}
             if channel_format:
                 channel_params['fmt'] = channel_format
             if channel_datefmt:
                 channel_params['datefmt'] = channel_datefmt
+            irc_params = {}
+            if channel_splitlines != None:
+                irc_params['lines_split'] = channel_splitlines
+            if channel_splitlines_leading != None:
+                irc_params['lines_leading'] = channel_splitlines_leading
+            if channel_splitlines_trailing != None:
+                irc_params['lines_trailing'] = channel_splitlines_trailing
             formatter = logger.ChannelOutputFormatter(**channel_params)
-            handler = logger.IrcLoggingHandler(self, channel_level)
+            handler = logger.IrcLoggingHandler(self, channel_level, **irc_params)
             handler.setFormatter(formatter)
 
             # set channel handler to `sopel` logger

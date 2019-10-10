@@ -240,6 +240,53 @@ class CoreSection(StaticSection):
     .. versionadded:: 7.0
     """
 
+    logging_channel_splitlines = ValidatedAttribute('logging_channel_splitlines',
+                                                    bool, default=False)
+    """If multi-line messages should be split into lines before sending to IRC.
+
+    This can be useful, e.g. when logging exceptions.  Without this, the
+    entire exception is collapsed to a single line and truncated to the
+    max length for a single IRC message (less than 512 bytes).
+
+    The number of lines sent to IRC can also be limited by setting
+    ``logging_channel_splitlines_leading`` or ``logging_channel_splitlines_leading``,
+    or both.
+
+    This defaults to false.
+    """
+
+    logging_channel_splitlines_leading = ValidatedAttribute('logging_channel_splitlines_leading',
+                                                            int, default=0)
+    """If splitlines is True, this limits the number of leading lines sent to IRC.
+
+    This causes multiline messages to print only the first N lines to IRC,
+    and then print a line indicating how many lines were cut.  If 0, no
+    leading lines are printed, only trailing lines; but if both this and
+    logging_channel_splitlines_trailing are 0, all lines are printed.
+
+    That means by default (both are 0), all lines are printed.  If only
+    leading is specified, only leading lines are printed, and if both
+    are specified then leading and trailing lines are printed.
+
+    This defaults to 0.
+    """
+
+    logging_channel_splitlines_trailing = ValidatedAttribute('logging_channel_splitlines_trailing',
+                                                             int, default=0)
+    """If splitlines is True, this limits the number of trailing lines sent to IRC.
+
+    This causes multiline messages to print only the last N lines to IRC,
+    after printing a line indicating how many lines were cut.  If 0, no
+    trailing lines are printed, only leading lines; but if both this and
+    logging_channel_splitlines_leading are 0, all lines are printed.
+
+    That means by default (both are 0), all lines are printed.  If only
+    trailing is specified, only trailing lines are printed, and if both
+    are specified then leading and trailing lines are printed.
+
+    This defaults to 0.
+    """
+
     logging_datefmt = ValidatedAttribute('logging_datefmt')
     """The logging format string to use for timestamps in logs.
 
